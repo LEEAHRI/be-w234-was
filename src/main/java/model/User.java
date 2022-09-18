@@ -6,7 +6,6 @@ public class User {
     private String name;
     private String email;
 
-    public User();
     public User(String userId, String password, String name, String email) {
         this.userId = userId;
         this.password = password;
@@ -33,5 +32,16 @@ public class User {
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
+    }
+
+    /**
+     * @param userId
+     * @param password
+     * @param name
+     * @param email
+     * @return
+     */
+    public static boolean isValid(String userId, String password, String name, String email){
+        return true;
     }
 }
