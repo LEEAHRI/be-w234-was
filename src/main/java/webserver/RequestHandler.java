@@ -34,18 +34,18 @@ public class RequestHandler implements Runnable {
         if (response == null) {
             response = ResponseFactory.create500ErrorResponse();
         }
-        try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out);) {
-            response200Header(dos, response.getBody().length);
+        try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out)) {
+            response200Header(dos, response.getBody().length, response.getContentType());
             responseBody(dos, response.getBody());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: text/" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -63,7 +63,7 @@ public class RequestHandler implements Runnable {
     }
 
     private Response route(Request request) {
-        if (request.getUrl().startsWith("/user")) {
+        if (request.getUrl().startsWith("/")) {
             return userController.routeUserRequest(request);
         }
         return serveResources(request);
