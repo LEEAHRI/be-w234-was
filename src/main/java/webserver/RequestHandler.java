@@ -4,13 +4,17 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 
-import org.apache.commons.lang3.StringUtils;
+import controller.UserController;
+import factory.RequestFactory;
+import factory.ResponseFactory;
+import model.Request;
+import model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
+    private UserController userController;
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -20,38 +24,22 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-/**
- * 요구사항 step1-1 : Requsest Header 출력
- */
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line = br.readLine();
-            String url = parseUrl(line);
-
-            while (true) {
-                line = br.readLine();
-                if (StringUtils.isEmpty(line)) break;
-                logger.debug("Line: {}", line);
-            }
-
-
-            DataOutputStream dos = new DataOutputStream(out);
-//            byte[] body = "Hello World".getBytes();
-
-/**
- * 요구사항 step1-3 : url 연결
- */
-            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-            response200Header(dos, body.length);
-            responseBody(dos, body);
-        } catch(
-                IOException e)
-
-        {
-            logger.error(e.getMessage());
+        Request request = RequestFactory.createRequest(connection);
+        if (request == null) {
+            logger.error("Invalid Request !");
+            return;
         }
 
+        Response response = route(request);
+        if (response == null) {
+            response = ResponseFactory.create500ErrorResponse();
+        }
+        try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out);) {
+            response200Header(dos, response.getBody().length);
+            responseBody(dos, response.getBody());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
@@ -74,12 +62,23 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    /**
-     * 요구사항 1-2 : parseUrl 메소드 생성
-      * @param line
-     * @return
-     */
-    private static String parseUrl(String line) {
-        return line.split(" ")[1];
+    private Response route(Request request) {
+        if (request.getUrl().startsWith("/user")) {
+            return userController.routeUserRequest(request);
+        }
+        return serveResources(request);
+    }
+
+    private Response serveResources(Request request) {
+        // resource
+        try {
+            Response response = new Response();
+            byte[] body = Files.readAllBytes(new File("./webapp" + request.getUrl()).toPath());
+            response.setBody(body);
+            return response;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
