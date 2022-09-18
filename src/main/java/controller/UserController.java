@@ -20,7 +20,7 @@ public class UserController {
 //    }
 
     public Response routeUserRequest(Request request) {
-        if (request.getUrl().equals("/user/create")) {
+        if (request.getUrl().equals("/index.html")) {
             return createUser(request);
         }
 //        if (request.getUrl().equals("/user/update")) {
