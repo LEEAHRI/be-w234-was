@@ -10,5 +10,16 @@ public class Response {
     private String contentLength;
     private byte[] body;
 
+    public byte[] getBody() {
+        return body;
+    }
+    public void setStatus(String status){
+        this.status = status;
+    }
+    public void setBody(byte[] body){
+        this.body = body;
+    }
+
+
     public Response() {}
 }

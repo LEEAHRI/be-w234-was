@@ -12,6 +12,8 @@ public class Request {
     private String connection;
     private String allowOrigins;
 
+    public String getUrl() {return url;}
+
     public Request(String method, String url, String queryString, String protocol) {
         this.method = method;
         this.url = url;
