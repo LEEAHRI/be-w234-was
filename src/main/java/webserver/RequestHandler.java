@@ -2,7 +2,9 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,28 +26,33 @@ public class RequestHandler implements Runnable {
  * 요구사항 step1-1 : Requsest Header 출력
  */
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line = "";
+            String line = br.readLine();
+            String url = parseUrl(line);
 
             while (true) {
                 line = br.readLine();
-                if (line == null || "".equals(line)) break;
+                if (StringUtils.isEmpty(line)) break;
                 logger.debug("Line: {}", line);
-                System.out.println("request:");
             }
 
 
-        DataOutputStream dos = new DataOutputStream(out);
-        byte[] body = "Hello World".getBytes();
-        response200Header(dos, body.length);
-        responseBody(dos, body);
-    } catch(
-    IOException e)
+            DataOutputStream dos = new DataOutputStream(out);
+//            byte[] body = "Hello World".getBytes();
 
-    {
-        logger.error(e.getMessage());
+/**
+ * 요구사항 step1-3 : url 연결
+ */
+            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+        } catch(
+                IOException e)
+
+        {
+            logger.error(e.getMessage());
+        }
+
     }
-
-}
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
         try {
@@ -65,5 +72,14 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    /**
+     * 요구사항 1-2 : parseUrl 메소드 생성
+      * @param line
+     * @return
+     */
+    private static String parseUrl(String line) {
+        return line.split(" ")[1];
     }
 }
