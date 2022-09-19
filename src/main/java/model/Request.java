@@ -1,17 +1,16 @@
 package model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Map;
 
 public class Request {
     private String method;
     private String url;
-    private String queryString;
+    private Map<String, String> queryString;
     private String protocol;
     private String host;
     private String connection;
     private String allowOrigins;
+    private Map<String, String> body;
 
     public String getMethod() {
         return method;
@@ -29,11 +28,11 @@ public class Request {
         this.url = url;
     }
 
-    public String getQueryString() {
+    public Map<String, String> getQueryString() {
         return queryString;
     }
 
-    public void setQueryString(String queryString) {
+    public void setQueryString(Map<String, String> queryString) {
         this.queryString = queryString;
     }
 
@@ -69,10 +68,26 @@ public class Request {
         this.allowOrigins = allowOrigins;
     }
 
-    public Request(String method, String url, String queryString, String protocol) {
+    public Map<String, String> getBody() {
+        return body;
+    }
+
+    public void setBody(Map<String, String> body) {
+        this.body = body;
+    }
+
+    public Request(String method, String url, Map<String, String> queryString, String protocol) {
         this.method = method;
         this.url = url;
         this.queryString = queryString;
         this.protocol = protocol;
+    }
+
+    public Request(String method, String url, Map<String, String> queryString, String protocol, Map<String, String> body) {
+        this.method = method;
+        this.url = url;
+        this.queryString = queryString;
+        this.protocol = protocol;
+        this.body = body;
     }
 }
