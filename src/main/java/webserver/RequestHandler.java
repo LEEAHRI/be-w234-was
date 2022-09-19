@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 
 import controller.UserController;
 import factory.RequestFactory;
@@ -11,6 +10,7 @@ import model.Request;
 import model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.ResourceUtils;
 
 
 public class RequestHandler implements Runnable {
@@ -35,8 +35,10 @@ public class RequestHandler implements Runnable {
 
         Response response = route(request);
         if (response == null) {
+            logger.error("Invalid Response !");
             response = ResponseFactory.create500ErrorResponse();
         }
+
         try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out)) {
             response200Header(dos, response.getContentLength(), response.getContentType());
             if (response.getBody() != null) {
@@ -75,16 +77,11 @@ public class RequestHandler implements Runnable {
     }
 
     private Response serveResources(Request request) {
-        // resource
-        try {
-            Response response = new Response();
-            byte[] body = Files.readAllBytes(new File("./webapp" + request.getUrl()).toPath());
-            response.setContentType("html");
-            response.setBody(body);
-            return response;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        Response response = new Response();
+        byte[] body = ResourceUtils.readFile(request.getUrl());
+        String extension = ResourceUtils.getExtension(request.getUrl());
+        response.setContentType(extension);
+        response.setBody(body);
+        return response;
     }
 }
