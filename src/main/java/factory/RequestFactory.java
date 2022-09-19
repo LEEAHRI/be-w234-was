@@ -13,7 +13,9 @@ public class RequestFactory {
     private static final Logger logger = LoggerFactory.getLogger(RequestFactory.class);
 
     public static Request createRequest(Socket connection) {
-        try (InputStream in = connection.getInputStream()) {
+
+        try {
+            InputStream in = connection.getInputStream();
             // 요구사항 step1-1 : Requsest Header 출력
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String methodAndUrl = br.readLine();

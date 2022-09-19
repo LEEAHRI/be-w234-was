@@ -1,7 +1,5 @@
 package service;
 
-import factory.RequestFactory;
-import factory.UserFactory;
 import db.Database;
 import model.Request;
 import model.User;
@@ -20,17 +18,12 @@ public class UserService {
     public static void create(Request request) {
 
         int index = request.getUrl().indexOf("?");
+        String requestPath = request.getUrl().substring(0, index);
         String queryString = request.getUrl().substring(index + 1);
         Map<String, String> params = HttpRequestUtils.parseQueryString(queryString);
-        try {
-            if (isValid(params.get("userId"), params.get("password"), params.get("name"), params.get("email"))) {
-                User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
-                Database.addUser(user);
-                logger.debug("{}", user);
-            }
-        } catch (exception.CreateUserException e) {
-            logger.error("CreateUserException : {}", e.getMessage());
-
-        }
+        User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
+        Database.addUser(user);
+        logger.debug("User : {}", user);
+        String url = "/index.html";
     }
 }

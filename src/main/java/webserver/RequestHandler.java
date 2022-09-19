@@ -12,13 +12,16 @@ import model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class RequestHandler implements Runnable {
+
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private UserController userController;
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        this.userController = new UserController();
     }
 
     public void run() {
@@ -35,8 +38,10 @@ public class RequestHandler implements Runnable {
             response = ResponseFactory.create500ErrorResponse();
         }
         try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out)) {
-            response200Header(dos, response.getBody().length, response.getContentType());
-            responseBody(dos, response.getBody());
+            response200Header(dos, response.getContentLength(), response.getContentType());
+            if (response.getBody() != null) {
+                responseBody(dos, response.getBody());
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -45,7 +50,7 @@ public class RequestHandler implements Runnable {
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/" + contentType + ";charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: text/html" + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -63,7 +68,7 @@ public class RequestHandler implements Runnable {
     }
 
     private Response route(Request request) {
-        if (request.getUrl().startsWith("/")) {
+        if (request.getUrl().startsWith("/user")) {
             return userController.routeUserRequest(request);
         }
         return serveResources(request);
@@ -74,6 +79,7 @@ public class RequestHandler implements Runnable {
         try {
             Response response = new Response();
             byte[] body = Files.readAllBytes(new File("./webapp" + request.getUrl()).toPath());
+            response.setContentType("html");
             response.setBody(body);
             return response;
         } catch (IOException e) {

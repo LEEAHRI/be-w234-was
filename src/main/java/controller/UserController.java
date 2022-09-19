@@ -6,6 +6,8 @@ import model.Request;
 import model.Response;
 import service.UserService;
 
+import java.util.Map;
+
 public class UserController {
     private UserService userService;
 
@@ -20,7 +22,7 @@ public class UserController {
 //    }
 
     public Response routeUserRequest(Request request) {
-        if (request.getUrl().equals("/index.html")) {
+        if (request.getUrl().equals("/user/create")) {
             return createUser(request);
         }
 //        if (request.getUrl().equals("/user/update")) {
