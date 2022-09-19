@@ -42,6 +42,11 @@ public class UserController {
         return response;
     }
 
+    /**
+     * Post 기능구현 추가
+     * @param request
+     * @return
+     */
     public Response routeUserRequest(Request request) {
         if (request.getUrl().equals("/user/create") && request.getMethod().equals("POST")) {
             return createUser(request);
