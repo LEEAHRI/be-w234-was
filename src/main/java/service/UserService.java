@@ -1,29 +1,22 @@
 package service;
 
 import db.Database;
-import model.Request;
 import model.User;
-import util.HttpRequestUtils;
-
-import java.util.Map;
-
-import static model.User.isValid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public static void create(Request request) {
-
-        int index = request.getUrl().indexOf("?");
-        String requestPath = request.getUrl().substring(0, index);
-        String queryString = request.getUrl().substring(index + 1);
-        Map<String, String> params = HttpRequestUtils.parseQueryString(queryString);
-        User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
+    public void create(User user) {
         Database.addUser(user);
-        logger.debug("User : {}", user);
-        String url = "/index.html";
+        logger.debug("User: {}", user);
+    }
+
+    public List<User> getUsers() {
+        return (List<User>) Database.findAll();
     }
 }
