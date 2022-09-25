@@ -27,6 +27,11 @@ public class UserService {
         logger.debug("User: {}", user);
     }
 
+    /**
+     * UserID로 User조회
+     * @param userId
+     * @return
+     */
     public User getUserByUserId(String userId) {
         return userRepository.findUserById(userId);
     }
@@ -35,7 +40,7 @@ public class UserService {
      * User 조회
      * @return
      */
-    public List<User> getUser(User user) {
+    public List<User> getUser() {
         return userRepository.findAll();
     }
 
