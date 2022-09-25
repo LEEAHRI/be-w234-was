@@ -12,6 +12,7 @@ import service.UserService;
 import util.ResourceUtils;
 
 import java.util.List;
+import java.util.Map;
 
 public class UserController {
 
@@ -50,15 +51,12 @@ public class UserController {
      */
     public Response routeUserRequest(Request request) {
         logger.debug("url : {}, method : {}", request.getUrl(), request.getMethod());
-        if (request.getUrl().equals("/user/create") && request.getMethod().equals("POST")) {
+        // 리뷰반영 1
+        String url = request.getUrl();
+        if (url.equals("/user/create") && request.getMethod().equals("POST")) {
             logger.debug("passed");
             return postUser(request);
         }
-
-        if (request.getUrl().equals("/user/create") && request.getMethod().equals("GET")) {
-            return getUser(request);
-        }
-
         return serveResources(request);
     }
 }
