@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.ResourceUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -44,10 +47,27 @@ public class UserController {
         return response;
     }
 
-    private Response getUser(Request request) {
-        User user = UserFactory.createUserByQueryString(request);
-        userService.create(user);
-        return ResponseFactory.create200OkResponse();
+    /**
+     * Step6 동적 html 구현
+     * @param request
+     * @return
+     */
+    private Response getUsers(Request request) {
+        Boolean isLogined = request.getCookie().get("logined") == "true";
+        String body = "";
+        if (isLogined) {
+            List<User> users = userService.getUser();
+            for (User user : users) {
+                body += user.getUserId() + "\n";
+            }
+        }else {
+            Response response = ResponseFactory.create302FoundResponse();
+            response.setLocation("http://localhost:8080/user/login_failed.html");
+            return response;
+        }
+        Response response = ResponseFactory.create200OkResponse();
+        response.setBody(body.getBytes(StandardCharsets.UTF_8));
+        return response;
     }
 
     private Response serveResources(Request request) {
@@ -77,8 +97,8 @@ public class UserController {
             logger.debug("passed");
             return postLogin(request);
         }
-        if (request.getUrl().equals("/user/create") && request.getMethod().equals("GET")) {
-            return getUser(request);
+        if (request.getUrl().equals("/user/list") && request.getMethod().equals("GET")) {
+            return getUsers(request);
         }
 
         return serveResources(request);
