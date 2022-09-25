@@ -9,14 +9,7 @@ import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
 
-    /**
-     *  url 파싱
-     * @param requestTarget
-     * @return
-     */
-    public static String parseUrl(String requestTarget) {
-        return requestTarget.split("\\?")[0];
-    }
+    // queryUrl 제거
 
     /**
      * @param queryString은
@@ -25,6 +18,15 @@ public class HttpRequestUtils {
      */
     public static Map<String, String> parseQueryString(String queryString) {
         return parseValues(queryString, "&");
+    }
+
+    /**
+     * body 파싱 (Post용)
+     * @param body
+     * @return
+     */
+    public static Map<String, String> parseBodyParam(String body) {
+        return parseValues(body, "&");
     }
 
     /**
