@@ -12,6 +12,8 @@ public class Request {
     private String allowOrigins;
     private Map<String, String> body;
 
+    private Map<String, String> cookie;
+
     private int contentLength;
 
     public Request() {
@@ -102,5 +104,13 @@ public class Request {
 
     public void setBody(Map<String, String> body) {
         this.body = body;
+    }
+
+    public Map<String, String> getCookie() {
+        return cookie;
+    }
+
+    public void setCookie(Map<String, String> cookie) {
+        this.cookie = cookie;
     }
 }
