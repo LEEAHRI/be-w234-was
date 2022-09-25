@@ -3,21 +3,25 @@ package factory;
 import model.Request;
 import model.User;
 
+import java.util.Map;
+
 public class UserFactory {
 
     public static User createUserByQueryString(Request request) {
-        String userId = request.getQueryString().get("userId");
-        String password = request.getQueryString().get("password");
-        String name = request.getQueryString().get("name");
-        String email = request.getQueryString().get("email");
+        Map<String, String> queryString = request.getQueryString();
+        String userId = queryString.get("userId");
+        String password = queryString.get("password");
+        String name = queryString.get("name");
+        String email = queryString.get("email");
         return new User(userId, password, name, email);
     }
 
     public static User createUserByBodyParam(Request request) {
-        String userId = request.getBody().get("userId");
-        String password = request.getBody().get("password");
-        String name = request.getBody().get("name");
-        String email = request.getBody().get("email");
+        Map<String, String> body = request.getBody();
+        String userId = body.get("userId");
+        String password = body.get("password");
+        String name = body.get("name");
+        String email = body.get("email");
         return new User(userId, password, name, email);
     }
 }
