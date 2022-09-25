@@ -1,7 +1,6 @@
 package controller;
 
 import factory.ResponseFactory;
-import factory.ResponseFactory;
 import factory.UserFactory;
 import model.Request;
 import model.Response;
@@ -10,9 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.ResourceUtils;
-
-import java.util.List;
-import java.util.Map;
 
 public class UserController {
 
