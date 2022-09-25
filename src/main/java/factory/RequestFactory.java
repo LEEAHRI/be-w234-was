@@ -47,6 +47,15 @@ public class RequestFactory {
                     headers.put(headerTokens[0], headerTokens[1]);
                 }
             }
+
+            Request request = new Request();
+            request.setMethod(method);
+            request.setUrl(url);
+            request.setProtocol(protocol);
+            if (headers.get("Cookie") != null) {
+                Map<String, String> cookie = HttpRequestUtils.parseCookies(headers.get("Cookie"));
+                request.setCookie(cookie);
+            }
             if (method.equals("POST")) {
                 logger.debug("Content-Length:{}", headers.get("Content-Length"));
                 String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
@@ -54,9 +63,11 @@ public class RequestFactory {
                 logger.debug("end");
                 Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(body);
                 System.out.println(bodyParam);
-                return new Request(method, url, protocol, bodyParam);
+                request.setBody(bodyParam);
+                return request;
             }
-            return new Request(method, url, queryString, protocol);
+            request.setQueryString(queryString);
+            return request;
         } catch (IOException e) {
             logger.error(e.getMessage());
             return null;
