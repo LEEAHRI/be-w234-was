@@ -22,10 +22,10 @@ public class UserController {
         userService = new UserService();
     }
 
-    private Response createUser(Request request) {
+    private Response postUser(Request request) {
         User user = UserFactory.createUserByBodyParam(request);
         userService.create(user);
-        return ResponseFactory.create200OkResponse();
+        return ResponseFactory.create302FoundResponse();
     }
 
     private Response getUser(Request request) {
@@ -44,12 +44,15 @@ public class UserController {
 
     /**
      * Post 기능구현 추가
+     *
      * @param request
      * @return
      */
     public Response routeUserRequest(Request request) {
+        logger.debug("url : {}, method : {}", request.getUrl(), request.getMethod());
         if (request.getUrl().equals("/user/create") && request.getMethod().equals("POST")) {
-            return createUser(request);
+            logger.debug("passed");
+            return postUser(request);
         }
 
         if (request.getUrl().equals("/user/create") && request.getMethod().equals("GET")) {
