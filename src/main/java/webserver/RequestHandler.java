@@ -91,7 +91,7 @@ public class RequestHandler implements Runnable {
         return serveResources(request);
     }
 
-    private Response serveResources(Request request) {
+    public Response serveResources(Request request) {
         Response response = new Response();
         byte[] body = ResourceUtils.readFile(request.getUrl());
         String extension = ResourceUtils.getExtension(request.getUrl());

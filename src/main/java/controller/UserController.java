@@ -37,7 +37,9 @@ public class UserController {
     private Response serveResources(Request request) {
         Response response = new Response();
         byte[] body = ResourceUtils.readFile(request.getUrl());
-        response.setContentType("html");
+        String extension = ResourceUtils.getExtension(request.getUrl());
+        response.setContentType("text/" + extension);
+        response.setStatus("200");
         response.setBody(body);
         return response;
     }
