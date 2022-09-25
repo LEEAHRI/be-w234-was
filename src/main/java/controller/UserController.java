@@ -1,6 +1,6 @@
 package controller;
 
-import factory.ResponseFactory;
+import exception.LoginFailException;
 import factory.ResponseFactory;
 import factory.UserFactory;
 import model.Request;
@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.ResourceUtils;
-
-import java.util.List;
 
 public class UserController {
 
@@ -25,7 +23,25 @@ public class UserController {
     private Response postUser(Request request) {
         User user = UserFactory.createUserByBodyParam(request);
         userService.create(user);
-        return ResponseFactory.create302FoundResponse();
+        Response response = ResponseFactory.create302FoundResponse();
+        response.setLocation("http://localhost:8080/index.html");
+        return response;
+    }
+
+    private Response postLogin(Request request) {
+        User user = UserFactory.createUserByBodyParam(request);
+        try {
+            userService.login(user);
+        } catch (LoginFailException e) {
+            Response response = ResponseFactory.create302FoundResponse();
+            response.setLocation("http://localhost:8080/user/login_failed.html");
+            response.getCookies().put("logined", "false");
+            return response;
+        }
+        Response response = ResponseFactory.create302FoundResponse();
+        response.setLocation("http://localhost:8080/index.html");
+        response.getCookies().put("logined", "true");
+        return response;
     }
 
     private Response getUser(Request request) {
@@ -57,6 +73,10 @@ public class UserController {
             return postUser(request);
         }
 
+        if (request.getUrl().equals("/user/login") && request.getMethod().equals("POST")) {
+            logger.debug("passed");
+            return postLogin(request);
+        }
         if (request.getUrl().equals("/user/create") && request.getMethod().equals("GET")) {
             return getUser(request);
         }
