@@ -1,17 +1,20 @@
 package factory;
 
+import ch.qos.logback.classic.util.LogbackMDCAdapter;
 import model.Request;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RequestFactory {
-
     private static final Logger logger = LoggerFactory.getLogger(RequestFactory.class);
     private static final String BLANK = " ";
 
@@ -24,22 +27,34 @@ public class RequestFactory {
             String firstLine = br.readLine();
             String method = firstLine.split(BLANK)[0];
             String requestTarget = firstLine.split(BLANK)[1];
+            System.out.println(method);
+            System.out.println(requestTarget);
             String url = requestTarget.split("\\?")[0];
             Map<String, String> queryString = null;
             if (requestTarget.contains("?")) {
                 queryString = HttpRequestUtils.parseQueryString(requestTarget.split("\\?")[1]);
             }
+            System.out.println(queryString);
             String protocol = firstLine.split(BLANK)[2];
+
+            Map<String, String> headers = new HashMap<>();
+            logger.debug("start");
             while (true) {
                 String line = br.readLine();
                 if (StringUtils.isEmpty(line)) break;
-                logger.debug("Line: {}", line);
+                String[] headerTokens = line.split(": ");
+                if (headerTokens.length == 2) {
+                    headers.put(headerTokens[0], headerTokens[1]);
+                }
             }
-
             if (method.equals("POST")) {
-                String line = br.readLine();
-                Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(line);
-                return new Request(method, url, queryString, protocol, bodyParam);
+                logger.debug("Content-Length:{}", headers.get("Content-Length"));
+                String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+                logger.debug("Request Body : {}", body);
+                logger.debug("end");
+                Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(body);
+                System.out.println(bodyParam);
+                return new Request(method, url, protocol, bodyParam);
             }
             return new Request(method, url, queryString, protocol);
         } catch (IOException e) {
