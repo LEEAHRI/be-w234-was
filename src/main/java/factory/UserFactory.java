@@ -6,7 +6,7 @@ import model.User;
 import java.util.Map;
 
 public class UserFactory {
-
+    //리뷰반영4
     public static User createUserByQueryString(Request request) {
         Map<String, String> queryString = request.getQueryString();
         String userId = queryString.get("userId");
