@@ -34,15 +34,20 @@ public class RequestHandler implements Runnable {
         }
 
         Response response = route(request);
+        logger.debug("response : {}", response.getStatus());
         if (response == null) {
             logger.error("Invalid Response !");
             response = ResponseFactory.create500ErrorResponse();
         }
 
         try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out)) {
-            response200Header(dos, response.getContentLength(), response.getContentType());
-            if (response.getBody() != null) {
-                responseBody(dos, response.getBody());
+            if (response.getStatus().equals("302")) {
+                response302Header(dos);
+            } else {
+                response200Header(dos, response.getContentLength(), response.getContentType());
+                if (response.getBody() != null) {
+                    responseBody(dos, response.getBody());
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -52,8 +57,18 @@ public class RequestHandler implements Runnable {
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html" + ";charset=utf-8\r\n");
+            dos.writeBytes("Content-Type:" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: /index.html\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -80,7 +95,8 @@ public class RequestHandler implements Runnable {
         Response response = new Response();
         byte[] body = ResourceUtils.readFile(request.getUrl());
         String extension = ResourceUtils.getExtension(request.getUrl());
-        response.setContentType(extension);
+        response.setContentType("text/" + extension);
+        response.setStatus("200");
         response.setBody(body);
         return response;
     }
