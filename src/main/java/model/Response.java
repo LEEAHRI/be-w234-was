@@ -1,8 +1,10 @@
 package model;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -11,7 +13,12 @@ public class Response {
     private String status;
     private String contentType;
     private Long contentLength = 0L;
+
+    private String location;
+
     private byte[] body;
+
+    private Map<String, String> cookies;
 
     public String getProtocol() {
         return protocol;
@@ -56,5 +63,21 @@ public class Response {
         this.body = body;
     }
 
-    public Response() {}
+    public Response() {
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Map<String, String> getCookies() {
+        if (this.cookies == null) {
+            this.cookies = new HashMap<>();
+        }
+        return cookies;
+    }
 }
