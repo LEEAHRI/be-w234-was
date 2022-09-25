@@ -12,6 +12,34 @@ public class Request {
     private String allowOrigins;
     private Map<String, String> body;
 
+    private int contentLength;
+
+    public Request() {
+
+    }
+
+    public Request(String method, String url, String protocol, Map<String, String> body, Integer contentLength) {
+        this.method = method;
+        this.url = url;
+        this.protocol = protocol;
+        this.body = body;
+        this.contentLength = contentLength;
+    }
+
+    public Request(String method, String url, Map<String, String>queryString, String protocol) {
+        this.method = method;
+        this.url = url;
+        this.queryString = queryString;
+        this.protocol = protocol;
+    }
+
+    public Request(String method, String url, String protocol, Map<String, String> body) {
+        this.method = method;
+        this.url = url;
+        this.protocol = protocol;
+        this.body = body;
+    }
+
     public String getMethod() {
         return method;
     }
@@ -73,21 +101,6 @@ public class Request {
     }
 
     public void setBody(Map<String, String> body) {
-        this.body = body;
-    }
-
-    public Request(String method, String url, Map<String, String> queryString, String protocol) {
-        this.method = method;
-        this.url = url;
-        this.queryString = queryString;
-        this.protocol = protocol;
-    }
-
-    public Request(String method, String url, Map<String, String> queryString, String protocol, Map<String, String> body) {
-        this.method = method;
-        this.url = url;
-        this.queryString = queryString;
-        this.protocol = protocol;
         this.body = body;
     }
 }
