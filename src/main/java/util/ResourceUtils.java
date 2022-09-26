@@ -24,7 +24,7 @@ public class ResourceUtils {
     /**
      * Step3 -> File 확장자로 content-type 처리
      * @param location
-     * @return
+     * @return html or css
      */
     public static String getExtension(String location) {
         return location.substring(location.lastIndexOf(".") + 1);
