@@ -18,15 +18,6 @@ public class HttpRequestUtils {
     }
 
     /**
-     * body 파싱 (Post용)
-     * @param body
-     * @return
-     */
-    public static Map<String, String> parseBodyParam(String body) {
-        return parseValues(body, "&");
-    }
-
-    /**
      * @param 쿠키
      *            값은 name1=value1; name2=value2 형식임
      * @return
