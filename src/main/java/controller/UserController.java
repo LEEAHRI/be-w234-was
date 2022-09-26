@@ -21,13 +21,13 @@ public class UserController {
     private Response postUser(Request request) {
         User user = UserFactory.createUserByBodyParam(request);
         userService.create(user);
-        return ResponseFactory.create302FoundResponse();
+        return ResponseFactory.createResponse(Integer.parseInt("302"));
     }
 
     private Response getUser(Request request) {
         User user = UserFactory.createUserByQueryString(request);
         userService.create(user);
-        return ResponseFactory.create200OkResponse();
+        return ResponseFactory.createResponse(Integer.parseInt("200"));
     }
 
     private Response serveResources(Request request) {
