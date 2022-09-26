@@ -19,8 +19,11 @@ public class RequestFactory {
     private static final String BLANK = " ";
 
     public static Request createRequest(Socket connection) {
-        try (InputStream in = connection.getInputStream(); BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
+
+        try {
+            InputStream in = connection.getInputStream();
             // 요구사항 step1-1 : Requsest Header 출력
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String[] firstLineParser = br.readLine().split(BLANK);
             String method = firstLineParser[0];
             String requestTarget = firstLineParser[1];
@@ -53,10 +56,26 @@ public class RequestFactory {
             }
             return new Request(method, url, queryString, protocol);
         } catch (IOException e) {
-            logger.error("Failed to not-read Method", e);
+            logger.error(e.getMessage());
             return null;
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
