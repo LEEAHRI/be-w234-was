@@ -1,5 +1,8 @@
+
+
 package controller;
 
+import factory.ResponseFactory;
 import factory.ResponseFactory;
 import factory.UserFactory;
 import model.Request;
@@ -9,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.ResourceUtils;
+
+import java.util.List;
 
 public class UserController {
 
@@ -34,7 +39,9 @@ public class UserController {
     private Response serveResources(Request request) {
         Response response = new Response();
         byte[] body = ResourceUtils.readFile(request.getUrl());
-        response.setContentType("html");
+        String extension = ResourceUtils.getExtension(request.getUrl());
+        response.setContentType("text/" + extension);
+        response.setStatus("200");
         response.setBody(body);
         return response;
     }
@@ -47,12 +54,15 @@ public class UserController {
      */
     public Response routeUserRequest(Request request) {
         logger.debug("url : {}, method : {}", request.getUrl(), request.getMethod());
-        // 리뷰반영 1
-        String url = request.getUrl();
-        if (url.equals("/user/create") && request.getMethod().equals("POST")) {
+        if (request.getUrl().equals("/user/create") && request.getMethod().equals("POST")) {
             logger.debug("passed");
             return postUser(request);
         }
+
+        if (request.getUrl().equals("/user/create") && request.getMethod().equals("GET")) {
+            return getUser(request);
+        }
+
         return serveResources(request);
     }
 }

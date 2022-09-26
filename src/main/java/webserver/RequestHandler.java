@@ -1,8 +1,6 @@
-
 package webserver;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import java.io.*;
 import java.net.Socket;
 
 import controller.UserController;

@@ -1,5 +1,6 @@
 package factory;
 
+import ch.qos.logback.classic.util.LogbackMDCAdapter;
 import model.Request;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -7,11 +8,9 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import util.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,17 +24,18 @@ public class RequestFactory {
             InputStream in = connection.getInputStream();
             // 요구사항 step1-1 : Requsest Header 출력
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String[] firstLineParser = br.readLine().split(BLANK);
-            //리뷰반영 2
-            String method = firstLineParser[0];
-            String requestTarget = firstLineParser[1];
+            String firstLine = br.readLine();
+            String method = firstLine.split(BLANK)[0];
+            String requestTarget = firstLine.split(BLANK)[1];
+            System.out.println(method);
+            System.out.println(requestTarget);
             String url = requestTarget.split("\\?")[0];
             Map<String, String> queryString = null;
             if (requestTarget.contains("?")) {
                 queryString = HttpRequestUtils.parseQueryString(requestTarget.split("\\?")[1]);
             }
             System.out.println(queryString);
-            String protocol = firstLineParser[2];
+            String protocol = firstLine.split(BLANK)[2];
 
             Map<String, String> headers = new HashMap<>();
             logger.debug("start");
@@ -63,3 +63,5 @@ public class RequestFactory {
         }
     }
 }
+
+
