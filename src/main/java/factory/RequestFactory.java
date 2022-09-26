@@ -24,18 +24,16 @@ public class RequestFactory {
             InputStream in = connection.getInputStream();
             // 요구사항 step1-1 : Requsest Header 출력
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String firstLine = br.readLine();
-            String method = firstLine.split(BLANK)[0];
-            String requestTarget = firstLine.split(BLANK)[1];
-            System.out.println(method);
-            System.out.println(requestTarget);
+            String[] firstLineParser = br.readLine().split(BLANK);
+            String method = firstLineParser[0];
+            String requestTarget = firstLineParser[1];
             String url = requestTarget.split("\\?")[0];
             Map<String, String> queryString = null;
             if (requestTarget.contains("?")) {
                 queryString = HttpRequestUtils.parseQueryString(requestTarget.split("\\?")[1]);
             }
             System.out.println(queryString);
-            String protocol = firstLine.split(BLANK)[2];
+            String protocol = firstLineParser[2];
 
             Map<String, String> headers = new HashMap<>();
             logger.debug("start");
