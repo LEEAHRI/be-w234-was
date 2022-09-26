@@ -8,8 +8,6 @@ import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
 
-    // queryUrl 제거
-
     /**
      * @param queryString은
      *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
