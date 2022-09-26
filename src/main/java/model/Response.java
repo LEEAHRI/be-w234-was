@@ -52,5 +52,4 @@ public class Response {
     public void setBody(byte[] body) {
         this.body = body;
     }
-    //리뷰반영3 : 불필요한 생성자 제거
 }
