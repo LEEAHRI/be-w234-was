@@ -37,8 +37,7 @@ public class Response {
     }
 
     public int getContentLength() {
-        int getContentLength = (this.getBody() != null) ? this.getBody().length : 0;
-        return getContentLength;
+        return (this.getBody() != null) ? this.getBody().length : 0;
     }
 
     public void setContentLength(Long contentLength) {
