@@ -18,6 +18,7 @@ public class UserService {
     public void create(User user) {
         Database.addUser(user);
         logger.debug("\n UserId: {} \n, UserPassword:{}\n, UserName:{}\n, UserEmail:{}\n", user.getUserId(), user.getPassword(), user.getName(), user.getEmail());
+        logger.debug("create user successed!");
     }
 
     /**
