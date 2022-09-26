@@ -14,17 +14,19 @@ public class Request {
 
     private int contentLength;
 
-    public Request(String method, String url, Map<String, String>queryString, String protocol) {
+    public Request(String method, String url, String protocol) {
         this.method = method;
         this.url = url;
-        this.queryString = queryString;
         this.protocol = protocol;
     }
 
+    public Request(String method, String url, Map<String, String> queryString, String protocol) {
+        this(method, url, protocol);
+        this.queryString = queryString;
+    }
+
     public Request(String method, String url, String protocol, Map<String, String> body) {
-        this.method = method;
-        this.url = url;
-        this.protocol = protocol;
+        this(method, url, protocol);
         this.body = body;
     }
 
