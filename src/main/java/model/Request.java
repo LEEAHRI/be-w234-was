@@ -14,17 +14,6 @@ public class Request {
 
     private int contentLength;
 
-    public Request() {
-
-    }
-    public Request(String method, String url, String protocol, Map<String, String> body, Integer contentLength) {
-        this.method = method;
-        this.url = url;
-        this.protocol = protocol;
-        this.body = body;
-        this.contentLength = contentLength;
-    }
-
     public Request(String method, String url, Map<String, String>queryString, String protocol) {
         this.method = method;
         this.url = url;
