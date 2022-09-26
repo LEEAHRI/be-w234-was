@@ -50,6 +50,7 @@ public class RequestHandler implements Runnable {
                 }
             }
         } catch (IOException e) {
+            logger.error("Invalid Response !", e);
             throw new RuntimeException(e);
         }
     }
@@ -61,7 +62,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed to 200 Response!:", e);
         }
     }
 
@@ -71,7 +72,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Location: /index.html\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed to 302 Response!:", e);
         }
     }
 
@@ -80,7 +81,7 @@ public class RequestHandler implements Runnable {
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed of ResponseBody!", e);
         }
     }
 
