@@ -1,8 +1,9 @@
 package webserver;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
-
 import controller.UserController;
 import factory.RequestFactory;
 import factory.ResponseFactory;
@@ -11,7 +12,6 @@ import model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.ResourceUtils;
-
 
 public class RequestHandler implements Runnable {
 
