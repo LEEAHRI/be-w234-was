@@ -12,14 +12,6 @@ public class Response {
     private Long contentLength = 0L;
     private byte[] body;
 
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -38,10 +30,6 @@ public class Response {
 
     public int getContentLength() {
         return (this.getBody() != null) ? this.getBody().length : 0;
-    }
-
-    public void setContentLength(Long contentLength) {
-        this.contentLength = contentLength;
     }
 
     public byte[] getBody() {
