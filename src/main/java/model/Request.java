@@ -17,7 +17,6 @@ public class Request {
     public Request() {
 
     }
-
     public Request(String method, String url, String protocol, Map<String, String> body, Integer contentLength) {
         this.method = method;
         this.url = url;
