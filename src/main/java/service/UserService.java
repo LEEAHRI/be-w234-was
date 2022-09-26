@@ -13,7 +13,7 @@ public class UserService {
     /**
      * User 생성
      *
-     * @param user
+     * @param user (UserId, UserPassword, UserName, UserEmail)
      */
     public void create(User user) {
         Database.addUser(user);
@@ -23,7 +23,7 @@ public class UserService {
     /**
      * User 조회
      *
-     * @return
+     * @return (User List)
      */
     public List<User> getUsers() {
         return (List<User>) Database.findAll();
