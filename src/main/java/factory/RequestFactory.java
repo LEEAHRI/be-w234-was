@@ -1,5 +1,6 @@
 
 package factory;
+
 import model.Request;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -9,9 +10,8 @@ import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.Socket;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,11 +19,8 @@ public class RequestFactory {
     private static final Logger logger = LoggerFactory.getLogger(RequestFactory.class);
     private static final String BLANK = " ";
 
-    public static Request createRequest(Socket connection) {
-        try{
-            InputStream in = connection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-                // 요구사항 step1-1 : Requsest Header 출력
+    public static Request createRequest(BufferedReader br) throws IOException {
+        try {
             String[] parsedFirstLine = br.readLine().split(BLANK);
             String method = parsedFirstLine[0];
             String requestTarget = parsedFirstLine[1];
@@ -45,8 +42,10 @@ public class RequestFactory {
             }
             if (method.equals("POST")) {
                 String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
+                body = URLDecoder.decode(body, StandardCharsets.UTF_8);
                 Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(body);
                 return new Request(method, url, protocol, bodyParam);
+
             }
             return new Request(method, url, queryString, protocol);
         } catch (IOException e) {
