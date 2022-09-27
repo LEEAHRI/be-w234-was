@@ -7,12 +7,7 @@ public class Request {
     private String url;
     private Map<String, String> queryString;
     private String protocol;
-    private String host;
-    private String connection;
-    private String allowOrigins;
     private Map<String, String> body;
-
-    private int contentLength;
 
     public Request(String method, String url, String protocol) {
         this.method = method;
