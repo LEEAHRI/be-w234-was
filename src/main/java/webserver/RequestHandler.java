@@ -1,46 +1,83 @@
 package webserver;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
+import controller.UserController;
+import factory.RequestFactory;
+import factory.ResponseFactory;
+import model.Request;
+import model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.ResourceUtils;
+
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
+    private UserController userController;
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        this.userController = new UserController();
     }
 
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+             DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
+            Request request;
+            request = RequestFactory.createRequest(br);
+
+            if (request == null) {
+                logger.error("Invalid Request !");
+                return;
+            }
+            Response response = route(request);
+            logger.debug("response : {}", response.getStatus());
+            if (response == null) {
+                logger.error("Invalid Response !");
+                response = ResponseFactory.createResponse("302");
+            }
+
+            if (response.getStatus().equals("302")) {
+                response302Header(dos);
+            } else {
+                response200Header(dos, response.getContentLength(), response.getContentType());
+                if (response.getBody() != null) {
+                    responseBody(dos, response.getBody());
+                }
+            }
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type:" + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed to 200 Response!:", e);
+        }
+    }
+
+    private void response302Header(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: /index.html\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error("Failed to 302 Response!:", e);
         }
     }
 
@@ -49,7 +86,24 @@ public class RequestHandler implements Runnable {
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed of ResponseBody!", e);
         }
+    }
+
+    private Response route(Request request) {
+        if (request.getUrl().startsWith("/user")) {
+            return userController.routeUserRequest(request);
+        }
+        return serveResources(request);
+    }
+
+    private Response serveResources(Request request) {
+        Response response = new Response();
+        byte[] body = ResourceUtils.readFile(request.getUrl());
+        String extension = ResourceUtils.getExtension(request.getUrl());
+        response.setContentType("text/" + extension);
+        response.setStatus("200");
+        response.setBody(body);
+        return response;
     }
 }
