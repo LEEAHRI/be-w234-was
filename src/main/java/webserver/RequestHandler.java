@@ -1,9 +1,11 @@
-
-
 package webserver;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import controller.UserController;
 import factory.RequestFactory;
@@ -16,7 +18,6 @@ import util.ResourceUtils;
 
 
 public class RequestHandler implements Runnable {
-
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private UserController userController;
     private Socket connection;
@@ -30,7 +31,7 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
              DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
             Request request;
             request = RequestFactory.createRequest(br);
@@ -54,8 +55,6 @@ public class RequestHandler implements Runnable {
                     responseBody(dos, response.getBody());
                 }
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
