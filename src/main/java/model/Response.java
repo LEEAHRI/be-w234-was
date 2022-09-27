@@ -12,6 +12,10 @@ public class Response {
     private Long contentLength = 0L;
     private byte[] body;
 
+    public void setBody(byte[] body) {
+        this.body = body;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -35,8 +39,5 @@ public class Response {
     public byte[] getBody() {
         return body;
     }
-
-    public void setBody(byte[] body) {
-        this.body = body;
-    }
 }
+

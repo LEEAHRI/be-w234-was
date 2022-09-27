@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.ResourceUtils;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 public class UserController {
 
@@ -42,7 +40,6 @@ public class UserController {
         response.setBody(body);
         return response;
     }
-
     /**
      * Post 기능구현 추가
      *

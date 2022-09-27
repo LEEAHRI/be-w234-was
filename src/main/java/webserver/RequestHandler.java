@@ -2,10 +2,9 @@
 
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+
 import controller.UserController;
 import factory.RequestFactory;
 import factory.ResponseFactory;
@@ -14,6 +13,7 @@ import model.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.ResourceUtils;
+
 
 public class RequestHandler implements Runnable {
 
@@ -29,20 +29,23 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-        Request request = RequestFactory.createRequest(connection);
-        if (request == null) {
-            logger.error("Invalid Request !");
-            return;
-        }
 
-        Response response = route(request);
-        logger.debug("response : {}", response.getStatus());
-        if (response == null) {
-            logger.error("Invalid Response !");
-            response = ResponseFactory.createResponse(302);
-        }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+             DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
+            Request request;
+            request = RequestFactory.createRequest(br);
 
-        try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out)) {
+            if (request == null) {
+                logger.error("Invalid Request !");
+                return;
+            }
+            Response response = route(request);
+            logger.debug("response : {}", response.getStatus());
+            if (response == null) {
+                logger.error("Invalid Response !");
+                response = ResponseFactory.createResponse("302");
+            }
+
             if (response.getStatus().equals("302")) {
                 response302Header(dos);
             } else {
@@ -51,8 +54,9 @@ public class RequestHandler implements Runnable {
                     responseBody(dos, response.getBody());
                 }
             }
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         } catch (IOException e) {
-            logger.error("Invalid Response !", e);
             throw new RuntimeException(e);
         }
     }
