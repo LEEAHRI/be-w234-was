@@ -8,11 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.ResourceUtils;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private UserService userService;
+    private String body;
 
     public UserController() {
         userService = new UserService();
@@ -21,13 +24,13 @@ public class UserController {
     private Response postUser(Request request) {
         User user = UserFactory.createUserByBodyParam(request);
         userService.create(user);
-        return ResponseFactory.createResponse(302);
+        return ResponseFactory.createResponse("302");
     }
 
     private Response getUser(Request request) {
         User user = UserFactory.createUserByQueryString(request);
         userService.create(user);
-        return ResponseFactory.createResponse(200);
+        return ResponseFactory.createResponse("200");
     }
 
     private Response serveResources(Request request) {
