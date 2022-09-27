@@ -23,7 +23,7 @@ public class UserService {
     /**
      * User 조회
      *
-     * @return (User List)
+     * @return userList 반환
      */
     public List<User> getUsers() {
         return (List<User>) Database.findAll();
