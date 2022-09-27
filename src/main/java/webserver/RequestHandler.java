@@ -39,7 +39,7 @@ public class RequestHandler implements Runnable {
         logger.debug("response : {}", response.getStatus());
         if (response == null) {
             logger.error("Invalid Response !");
-            response = ResponseFactory.createResponse(Integer.parseInt("302"));
+            response = ResponseFactory.createResponse(302);
         }
 
         try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out)) {
