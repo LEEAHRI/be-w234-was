@@ -1,3 +1,4 @@
+
 package factory;
 import model.Request;
 import org.apache.commons.lang3.StringUtils;
@@ -19,24 +20,21 @@ public class RequestFactory {
     private static final String BLANK = " ";
 
     public static Request createRequest(Socket connection) {
-
-        try {
+        try{
             InputStream in = connection.getInputStream();
-            // 요구사항 step1-1 : Requsest Header 출력
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String[] firstLineParser = br.readLine().split(BLANK);
-            String method = firstLineParser[0];
-            String requestTarget = firstLineParser[1];
+                // 요구사항 step1-1 : Requsest Header 출력
+            String[] parsedFirstLine = br.readLine().split(BLANK);
+            String method = parsedFirstLine[0];
+            String requestTarget = parsedFirstLine[1];
             String url = requestTarget.split("\\?")[0];
             Map<String, String> queryString = null;
             if (requestTarget.contains("?")) {
                 queryString = HttpRequestUtils.parseQueryString(requestTarget.split("\\?")[1]);
             }
-            System.out.println(queryString);
-            String protocol = firstLineParser[2];
+            String protocol = parsedFirstLine[2];
 
             Map<String, String> headers = new HashMap<>();
-            logger.debug("start");
             while (true) {
                 String line = br.readLine();
                 if (StringUtils.isEmpty(line)) break;
@@ -46,29 +44,17 @@ public class RequestFactory {
                 }
             }
             if (method.equals("POST")) {
-                logger.debug("Content-Length:{}", headers.get("Content-Length"));
                 String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
-                logger.debug("Request Body : {}", body);
-                logger.debug("end");
                 Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(body);
-                System.out.println(bodyParam);
                 return new Request(method, url, protocol, bodyParam);
             }
             return new Request(method, url, queryString, protocol);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed to not-read Method", e);
             return null;
         }
     }
 }
-
-
-
-
-
-
-
-
 
 
 
