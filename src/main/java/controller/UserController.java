@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import service.UserService;
 import util.ResourceUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -23,7 +26,7 @@ public class UserController {
     private Response postUser(Request request) {
         User user = UserFactory.createUserByBodyParam(request);
         userService.create(user);
-        Response response = ResponseFactory.createResponse("302");
+        Response response = ResponseFactory.createResponse("302 FOUND");
         response.setLocation("http://localhost:8080/index.html");
         return response;
     }
@@ -33,23 +36,34 @@ public class UserController {
         try {
             userService.login(user);
         } catch (LoginFailException e) {
-            Response response = ResponseFactory.createResponse("302");
+            Response response = ResponseFactory.createResponse("302 FOUND");
             response.setLocation("http://localhost:8080/user/login_failed.html");
             response.getCookies().put("logined", "false");
             return response;
         }
-        Response response = ResponseFactory.createResponse("302");
+        Response response = ResponseFactory.createResponse("302 FOUND");
         response.setLocation("http://localhost:8080/index.html");
         response.getCookies().put("logined", "true");
         return response;
     }
 
-    private Response getUser(Request request) {
-        User user = UserFactory.createUserByQueryString(request);
-        userService.create(user);
-        return ResponseFactory.createResponse("200");
+    private Response getUsers(Request request) {
+        Boolean isLogined = request.getCookie().get("logined") == "true";
+        String body = "";
+        if (isLogined) {
+            List<User> users = userService.getUser();
+            for (User user : users) {
+                body += user.getUserId() + "\n";
+            }
+        }else {
+            Response response = ResponseFactory.createResponse("302 FOUND");
+            response.setLocation("http://localhost:8080/user/login_failed.html");
+            return response;
+        }
+        Response response = ResponseFactory.createResponse("200");
+        response.setBody(body.getBytes(StandardCharsets.UTF_8));
+        return response;
     }
-
     private Response serveResources(Request request) {
         Response response = new Response();
         byte[] body = ResourceUtils.readFile(request.getUrl());
@@ -59,7 +73,6 @@ public class UserController {
         response.setBody(body);
         return response;
     }
-
     /**
      * Post 기능구현 추가
      *
@@ -76,11 +89,9 @@ public class UserController {
             logger.debug("passed");
             return postLogin(request);
         }
-
-        if (request.getUrl().equals("/user/create") && request.getMethod().equals("GET")) {
-            return getUser(request);
+        if (request.getUrl().equals("/user/list") && request.getMethod().equals("GET")) {
+            return getUsers(request);
         }
-
         return serveResources(request);
     }
 }
