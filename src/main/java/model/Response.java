@@ -41,6 +41,9 @@ public class Response {
         return (this.getBody() != null) ? this.getBody().length : 0;
     }
 
+    public void setLocation(String location){
+        this.location = location;
+    }
     public byte[] getBody() {
         return body;
     }
