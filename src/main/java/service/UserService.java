@@ -1,5 +1,6 @@
 package service;
 
+import db.Database;
 import exception.LoginFailException;
 import model.User;
 
@@ -16,6 +17,7 @@ public class UserService {
     public UserService() {
         userRepository = new UserRepository();
     }
+
     /**
      * User 생성
      * @param user
@@ -24,6 +26,7 @@ public class UserService {
         userRepository.addUser(user);
         logger.debug("User: {}", user);
     }
+
     /**
      * UserID로 User조회
      * @param userId
@@ -32,6 +35,7 @@ public class UserService {
     public User getUserByUserId(String userId) {
         return userRepository.findUserById(userId);
     }
+
     /**
      * User 조회
      * @return
@@ -39,6 +43,7 @@ public class UserService {
     public List<User> getUser() {
         return userRepository.findAll();
     }
+
     public void login(User loginUser) {
         User user = getUserByUserId(loginUser.getUserId());
         if (user == null) {
