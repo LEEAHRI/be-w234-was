@@ -27,7 +27,7 @@ public class UserController {
         User user = UserFactory.createUserByBodyParam(request);
         userService.create(user);
         Response response = ResponseFactory.createResponse("302 FOUND");
-        response.setLocation("http://localhost:8080/index.html");
+        response.setLocation("/index.html");
         return response;
     }
 
@@ -37,12 +37,12 @@ public class UserController {
             userService.login(user);
         } catch (LoginFailException e) {
             Response response = ResponseFactory.createResponse("302 FOUND");
-            response.setLocation("http://localhost:8080/user/login_failed.html");
+            response.setLocation("/user/login_failed.html");
             response.getCookies().put("logined", "false");
             return response;
         }
         Response response = ResponseFactory.createResponse("302 FOUND");
-        response.setLocation("http://localhost:8080/index.html");
+        response.setLocation("/index.html");
         response.getCookies().put("logined", "true");
         return response;
     }
@@ -57,10 +57,10 @@ public class UserController {
             }
         }else {
             Response response = ResponseFactory.createResponse("302 FOUND");
-            response.setLocation("http://localhost:8080/user/login_failed.html");
+            response.setLocation("/user/login_failed.html");
             return response;
         }
-        Response response = ResponseFactory.createResponse("200");
+        Response response = ResponseFactory.createResponse("200 OK");
         response.setBody(body.getBytes(StandardCharsets.UTF_8));
         return response;
     }
@@ -69,7 +69,7 @@ public class UserController {
         byte[] body = ResourceUtils.readFile(request.getUrl());
         String extension = ResourceUtils.getExtension(request.getUrl());
         response.setContentType("text/" + extension);
-        response.setStatus("200");
+        response.setStatus("200 OK");
         response.setBody(body);
         return response;
     }
