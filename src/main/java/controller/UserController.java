@@ -1,4 +1,5 @@
 package controller;
+
 import exception.LoginFailException;
 import factory.ResponseFactory;
 import factory.UserFactory;
@@ -26,6 +27,7 @@ public class UserController {
         response.setLocation("http://localhost:8080/index.html");
         return response;
     }
+
     private Response postLogin(Request request) {
         User user = UserFactory.createUserByBodyParam(request);
         try {
@@ -41,11 +43,13 @@ public class UserController {
         response.getCookies().put("logined", "true");
         return response;
     }
+
     private Response getUser(Request request) {
         User user = UserFactory.createUserByQueryString(request);
         userService.create(user);
         return ResponseFactory.createResponse("200");
     }
+
     private Response serveResources(Request request) {
         Response response = new Response();
         byte[] body = ResourceUtils.readFile(request.getUrl());
@@ -55,6 +59,7 @@ public class UserController {
         response.setBody(body);
         return response;
     }
+
     /**
      * Post 기능구현 추가
      *
@@ -78,3 +83,4 @@ public class UserController {
 
         return serveResources(request);
     }
+}
