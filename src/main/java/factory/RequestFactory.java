@@ -10,6 +10,9 @@ import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -19,9 +22,14 @@ public class RequestFactory {
     private static final Logger logger = LoggerFactory.getLogger(RequestFactory.class);
     private static final String BLANK = " ";
 
-    public static Request createRequest(BufferedReader br) throws IOException {
+    public static Request createRequest(Socket connection) {
+
         try {
+            InputStream in = connection.getInputStream();
+            // 요구사항 step1-1 : Requsest Header 출력
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String[] parsedFirstLine = br.readLine().split(BLANK);
+            br.readLine();
             String method = parsedFirstLine[0];
             String requestTarget = parsedFirstLine[1];
             String url = requestTarget.split("\\?")[0];
@@ -40,14 +48,23 @@ public class RequestFactory {
                     headers.put(headerTokens[0], headerTokens[1]);
                 }
             }
+            Request request = new Request();
+            request.setMethod(method);
+            request.setUrl(url);
+            request.setProtocol(protocol);
+            if (headers.get("Cookie") != null) {
+                Map<String, String> cookie = HttpRequestUtils.parseCookies(headers.get("Cookie"));
+                request.setCookie(cookie);
+            }
             if (method.equals("POST")) {
                 String body = IOUtils.readData(br, Integer.parseInt(headers.get("Content-Length")));
                 body = URLDecoder.decode(body, StandardCharsets.UTF_8);
                 Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(body);
-                return new Request(method, url, protocol, bodyParam);
-
+                request.setBody(bodyParam);
+                return request;
             }
-            return new Request(method, url, queryString, protocol);
+            request.setQueryString(queryString);
+            return request;
         } catch (IOException e) {
             logger.error("Failed to not-read Method", e);
             return null;
