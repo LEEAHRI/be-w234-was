@@ -90,7 +90,7 @@ public class RequestHandler implements Runnable {
         byte[] body = ResourceUtils.readFile(request.getUrl());
         String extension = ResourceUtils.getExtension(request.getUrl());
         response.setContentType("text/" + extension);
-        response.setStatus("200");
+        response.setStatus("200 OK");
         response.setBody(body);
         return response;
     }
