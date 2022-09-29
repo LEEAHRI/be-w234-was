@@ -49,11 +49,11 @@ public class UserController {
 
     private Response getUsers(Request request) {
         Boolean isLogined = request.getCookie().get("logined") == "true";
-        String body = "";
+        StringBuilder body = new StringBuilder();
         if (isLogined) {
             List<User> users = userService.getUser();
             for (User user : users) {
-                body += user.getUserId() + "\n";
+                body.append(user.getUserId() + "\n");
             }
         }else {
             Response response = ResponseFactory.createResponse("302 FOUND");
@@ -61,7 +61,7 @@ public class UserController {
             return response;
         }
         Response response = ResponseFactory.createResponse("200 OK");
-        response.setBody(body.getBytes(StandardCharsets.UTF_8));
+        response.setBody(body.toString().getBytes(StandardCharsets.UTF_8));
         return response;
     }
     private Response serveResources(Request request) {
