@@ -1,6 +1,5 @@
 package service;
 
-import db.Database;
 import exception.LoginFailException;
 import model.User;
 
