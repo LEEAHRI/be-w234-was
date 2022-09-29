@@ -1,9 +1,8 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import controller.UserController;
@@ -29,25 +28,29 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-        Request request = RequestFactory.createRequest(connection);
-        if (request == null) {
-            logger.error("Invalid Request !");
-            return;
-        }
 
-        Response response = route(request);
-        logger.debug("response : {}", response.getStatus());
-        if (response == null) {
-            logger.error("Invalid Response !");
-            response = ResponseFactory.createResponse("500");
-        }
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+             DataOutputStream dos = new DataOutputStream(connection.getOutputStream())) {
+            Request request;
+            request = RequestFactory.createRequest(br);
 
-        try (OutputStream out = connection.getOutputStream(); DataOutputStream dos = new DataOutputStream(out)) {
-            writeResponse(response, dos);
+            if (request == null) {
+                logger.error("Invalid Request !");
+                return;
+
+            }
+            Response response = route(request);
+            logger.debug("response : {}", response.getStatus());
+            if (response == null) {
+                logger.error("Invalid Response !");
+            } else {
+                writeResponse(response, dos);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 
 
     private void writeResponse(Response response, DataOutputStream dos) {

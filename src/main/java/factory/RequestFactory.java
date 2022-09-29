@@ -10,7 +10,6 @@ import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URLDecoder;
@@ -22,14 +21,9 @@ public class RequestFactory {
     private static final Logger logger = LoggerFactory.getLogger(RequestFactory.class);
     private static final String BLANK = " ";
 
-    public static Request createRequest(Socket connection) {
-
+    public static Request createRequest(BufferedReader br) throws IOException {
         try {
-            InputStream in = connection.getInputStream();
-            // 요구사항 step1-1 : Requsest Header 출력
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String[] parsedFirstLine = br.readLine().split(BLANK);
-            br.readLine();
             String method = parsedFirstLine[0];
             String requestTarget = parsedFirstLine[1];
             String url = requestTarget.split("\\?")[0];
