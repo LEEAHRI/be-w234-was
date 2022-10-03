@@ -9,8 +9,10 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
+import util.HTMLTableUtils;
 import util.ResourceUtils;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -47,13 +49,15 @@ public class UserController {
         return response;
     }
 
-    private Response getUsers(Request request) {
-        Boolean isLogined = request.getCookie().get("logined") == "true";
-        StringBuilder body = new StringBuilder();
+    private Response getUsers(Request request){
+        Boolean isLogined = request.getCookie().get("logined").equals("true");
+        String body;
         if (isLogined) {
             List<User> users = userService.getUser();
-            for (User user : users) {
-                body.append(user.getUserId() + "\n");
+            try {
+                body = HTMLTableUtils.getUserListTable("./webapp/user/list.html", users);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }else {
             Response response = ResponseFactory.createResponse("302 FOUND");
@@ -61,7 +65,7 @@ public class UserController {
             return response;
         }
         Response response = ResponseFactory.createResponse("200 OK");
-        response.setBody(body.toString().getBytes(StandardCharsets.UTF_8));
+        response.setBody(body.getBytes(StandardCharsets.UTF_8));
         return response;
     }
     private Response serveResources(Request request) {
@@ -89,7 +93,7 @@ public class UserController {
             logger.debug("passed");
             return postLogin(request);
         }
-        if (request.getUrl().equals("/user/list") && request.getMethod().equals("GET")) {
+        if (request.getUrl().equals("/user/list.html") && request.getMethod().equals("GET")) {
             return getUsers(request);
         }
         return serveResources(request);
