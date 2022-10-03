@@ -1,13 +1,15 @@
 package webserver;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import controller.UserController;
 import factory.RequestFactory;
-import factory.ResponseFactory;
 import model.Request;
 import model.Response;
 import org.slf4j.Logger;
@@ -62,18 +64,19 @@ public class RequestHandler implements Runnable {
             if (response.getContentType() != null) {
                 dos.writeBytes("Content-Type: " + response.getContentType() + ";charset=utf-8\r\n");
             }
-            dos.writeBytes("Content-Length: " + response.getContentLength() + "\r\n");
-            dos.writeBytes("\r\n");
-            if (response.getBody() != null) {
-                byte[] body = response.getBody();
-                dos.write(body, 0, body.length);
-            }
             if (response.getCookies() != null) {
                 Map<String, String> cookies = response.getCookies();
                 for (String key : response.getCookies().keySet()) {
                     dos.writeBytes("Set-Cookie: " + key + "=" + cookies.get(key) + "; Path=/\r\n");
                 }
             }
+            dos.writeBytes("Content-Length: " + response.getContentLength() + "\r\n");
+            dos.writeBytes("\r\n");
+            if (response.getBody() != null) {
+                byte[] body = response.getBody();
+                dos.write(body, 0, body.length);
+            }
+
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
