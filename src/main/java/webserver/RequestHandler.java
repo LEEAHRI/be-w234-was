@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import controller.UserController;
 import factory.RequestFactory;
-import factory.ResponseFactory;
 import model.Request;
 import model.Response;
 import org.slf4j.Logger;
@@ -39,51 +39,43 @@ public class RequestHandler implements Runnable {
             if (request == null) {
                 logger.error("Invalid Request !");
                 return;
+
             }
             Response response = route(request);
             logger.debug("response : {}", response.getStatus());
             if (response == null) {
                 logger.error("Invalid Response !");
-                response = ResponseFactory.createResponse("302");
-            }
-
-            if (response.getStatus().equals("302")) {
-                response302Header(dos);
             } else {
-                response200Header(dos, response.getContentLength(), response.getContentType());
-                if (response.getBody() != null) {
-                    responseBody(dos, response.getBody());
-                }
+                writeResponse(response, dos);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type:" + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error("Failed to 200 Response!:", e);
-        }
-    }
 
-    private void response302Header(DataOutputStream dos) {
+    private void writeResponse(Response response, DataOutputStream dos) {
         try {
-            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: /index.html\r\n");
+            dos.writeBytes("HTTP/1.1 " + response.getStatus() + "\r\n");
+            if (response.getStatus() != null && response.getStatus().equals("302 FOUND")) {
+                dos.writeBytes("Location: " + response.getLocation() + "\r\n");
+            }
+            if (response.getContentType() != null) {
+                dos.writeBytes("Content-Type: " + response.getContentType() + ";charset=utf-8\r\n");
+            }
+            if (response.getCookies() != null) {
+                Map<String, String> cookies = response.getCookies();
+                for (String key : response.getCookies().keySet()) {
+                    dos.writeBytes("Set-Cookie: " + key + "=" + cookies.get(key) + "; Path=/\r\n");
+                }
+            }
+            dos.writeBytes("Content-Length: " + response.getContentLength() + "\r\n");
             dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error("Failed to 302 Response!:", e);
-        }
-    }
+            if (response.getBody() != null) {
+                byte[] body = response.getBody();
+                dos.write(body, 0, body.length);
+            }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
             logger.error("Failed of ResponseBody!", e);
@@ -97,12 +89,12 @@ public class RequestHandler implements Runnable {
         return serveResources(request);
     }
 
-    private Response serveResources(Request request) {
+    public Response serveResources(Request request) {
         Response response = new Response();
         byte[] body = ResourceUtils.readFile(request.getUrl());
         String extension = ResourceUtils.getExtension(request.getUrl());
         response.setContentType("text/" + extension);
-        response.setStatus("200");
+        response.setStatus("200 OK");
         response.setBody(body);
         return response;
     }
