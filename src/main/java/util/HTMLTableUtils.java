@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class HTMLTableUtils {
-    public static String getUserListTable(String htmlPath, List<User> users) throws IOException{
+    public static String getUserListTable(String htmlPath, List<User> users) throws IOException {
         var document = Jsoup.parse(new File(htmlPath), "UTF-8");
         var table = getTableClassElement(document);
         var tbody = getTableBodyTagElement(table);
@@ -18,20 +18,16 @@ public class HTMLTableUtils {
         return document.html();
     }
 
-    public static Element getTableBodyTagElement(Element table){
-        return table.getElementsByTag("tbody")
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new WebServerErrorException());
+    public static Element getTableBodyTagElement(Element table) {
+        return table.getElementsByTag("tbody").stream().findFirst().orElseThrow(WebServerErrorException::new);
+
     }
 
-    public static Element getTableClassElement(Element table){
-        return table.getElementsByTag("tbody")
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new WebServerErrorException());
+    public static Element getTableClassElement(Element table) {
+        return table.getElementsByTag("tbody").stream().findFirst().orElseThrow(WebServerErrorException::new);
     }
-    public static void writeUserRows(List<User> users, Element tbody){
+
+    public static void writeUserRows(List<User> users, Element tbody) {
         int rowNum = 1;
         StringBuilder stringBuilder = new StringBuilder();
         for (var user : users) {
