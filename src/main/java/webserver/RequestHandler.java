@@ -54,7 +54,6 @@ public class RequestHandler implements Runnable {
     }
 
 
-
     private void writeResponse(Response response, DataOutputStream dos) {
         try {
             dos.writeBytes("HTTP/1.1 " + response.getStatus() + "\r\n");
@@ -85,8 +84,6 @@ public class RequestHandler implements Runnable {
 
     private Response route(Request request) {
         if (request.getUrl().startsWith("/user")) {
-            return userController.routeUserRequest(request);
-        } else if (request.getUrl().equals("/user/login")) {
             return userController.routeUserRequest(request);
         }
         return serveResources(request);
