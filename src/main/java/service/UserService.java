@@ -23,7 +23,7 @@ public class UserService {
      */
     public void create(User user) {
         userRepository.addUser(user);
-        logger.debug("User: {}", user);
+        logger.debug("Create User Successed!\n UserId: {} \n, UserPassword:{}\n, UserName:{}\n, UserEmail:{}\n", user.getUserId(), user.getPassword(), user.getName(), user.getEmail());
     }
 
     /**
