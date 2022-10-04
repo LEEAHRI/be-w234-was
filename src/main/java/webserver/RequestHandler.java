@@ -78,7 +78,7 @@ public class RequestHandler implements Runnable {
 
             dos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed of ResponseBody!", e);
         }
     }
 
