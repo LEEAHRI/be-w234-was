@@ -33,7 +33,7 @@ public class HTMLTableUtils {
     }
     public static void writeUserRows(List<User> users, Element tbody){
         int rowNum = 1;
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
         for (var user : users) {
             stringBuilder.append(String.format(
                     "<tr> <th scope=\"row\">%d</th> <td>%s</td> <td>%s</td> <td>%s</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td> </tr>",
